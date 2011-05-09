@@ -1,7 +1,7 @@
 SCHEMA AP242_BO_MODEL;
 
--- v0.2
--- generated: 2011-05-04
+-- Version: v0.2
+-- Generation time: 2011-05-07T22:49:10+01:00
 
 TYPE limit_qualifier = STRING; END_TYPE;
 TYPE quantity = STRING; END_TYPE;
@@ -362,7 +362,7 @@ END_TYPE;
 
 TYPE event_or_date_select = SELECT ( 
   Date_time,
-  Event
+  EVENT
 );
 END_TYPE;
 
@@ -505,7 +505,7 @@ END_TYPE;
 TYPE period_or_date_select = SELECT ( 
   Date_time,
   Duration,
-  Event
+  EVENT
 );
 END_TYPE;
 
@@ -625,6 +625,49 @@ END_TYPE;
 TYPE specification_operand_select = SELECT ( 
   Specification,
   Specification_expression
+);
+END_TYPE;
+
+TYPE string_select = SELECT ( 
+  Alias_identification,
+  Alternate_part_relationship,
+  Application_context,
+  Approval,
+  Approval_relationship,
+  Assembly_component_relationship,
+  Assembly_relationship_substitution,
+  Cartesian_point,
+  Certification,
+  Certification_assignment,
+  Contract,
+  Date_time_assignment,
+  Digital_document_definition,
+  Document,
+  Document_assignment,
+  Document_definition_relationship,
+  Document_version,
+  Effectivity,
+  Effectivity_relationship,
+  Event,
+  External_geometric_model,
+  External_source_identification,
+  File_relationship,
+  Make_from_relationship,
+  Organization_relationship,
+  Part_shape,
+  Part_version_view_relationship,
+  Person_in_organization,
+  Physical_document_definition,
+  Project,
+  Project_assignment,
+  Project_relationship,
+  Property_assignment,
+  Property_definition,
+  Property_definition_relationship,
+  Property_value,
+  Security_classification_assignment,
+  Shape_element,
+  Shape_element_relationship
 );
 END_TYPE;
 
@@ -783,7 +826,7 @@ END_ENTITY;
 
 ENTITY Attribute_translation_assignment;  -- GMI4
   attribute : STRING; 
-  instance  : STRING; 
+  instance  : string_select; 
   language  : Language; 
   text      : STRING; 
 END_ENTITY;
@@ -1366,7 +1409,7 @@ END_ENTITY;
 
 ENTITY Language_indication;  -- GMI4
   attribute : STRING; 
-  instance  : STRING; 
+  instance  : string_select; 
   language  : Language; 
 END_ENTITY;
 
