@@ -1001,7 +1001,7 @@ ENTITY Assembly_relationship_substitution;  -- SBC3
 END_ENTITY;
 
 ENTITY Assigned_id;
-  context     : Organization; 
+  id_context     : Organization; 
   description : OPTIONAL STRING; 
   id          : STRING; 
   role        : OPTIONAL STRING; 
