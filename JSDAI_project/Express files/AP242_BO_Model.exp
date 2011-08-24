@@ -1,7 +1,7 @@
 SCHEMA AP242_BO_Model;
 
--- Version: 0.4 draft
--- Generation time: 2011-07-20T11:17:23+01:00
+-- Version: 1.0 first internal draft
+-- Generation time: 2011-08-24T07:22:41+01:00
 
 TYPE limit_qualifier = STRING; END_TYPE;
 TYPE quantity = STRING; END_TYPE;
@@ -427,7 +427,7 @@ END_TYPE;
 
 TYPE event_or_date_select = SELECT ( 
   Date_time,
-  Event
+  EVENT
 );
 END_TYPE;
 
@@ -593,7 +593,7 @@ END_TYPE;
 TYPE period_or_date_select = SELECT ( 
   Date_time,
   Duration,
-  Event
+  EVENT
 );
 END_TYPE;
 
@@ -864,10 +864,11 @@ ENTITY Activity;  -- AWM1
   activity_type           : STRING; 
   actual_end_date         : OPTIONAL Date_time; 
   actual_start_date       : OPTIONAL Date_time; 
+  additional_ids          : OPTIONAL SET [1:?] OF Assigned_id; 
   chosen_method           : OPTIONAL Activity_method; 
   concerned_organizations : SET [1:?] OF Organization; 
   description             : OPTIONAL STRING; 
-  id                      : STRING; 
+  id                      : Assigned_id; 
   planned_end_date        : OPTIONAL period_or_date_select; 
   planned_start_date      : OPTIONAL event_or_date_select; 
   requestor               : OPTIONAL Date_and_person_organization; 
@@ -979,10 +980,9 @@ END_ENTITY;
 ENTITY Assembly_component_relationship ABSTRACT
 SUPERTYPE OF ( ONEOF (General_assembly_component_relationship, Next_higher_assembly, Promissory_usage, Mated_part_association))
 SUBTYPE OF ( Part_version_view_instance_relationship );
-  SELF\Part_version_view_instance_relationship.relating RENAMED assembly : Assembly_definition; 
-  SELF\Part_version_view_instance_relationship.related RENAMED component : Part_instance; 
-  location_indicator                                                     : OPTIONAL STRING; 
-  placement                                                              : OPTIONAL transformation_select; 
+  SELF\Part_version_view_instance_relationship.relating : Assembly_definition; 
+  location_indicator                                    : OPTIONAL STRING; 
+  placement                                             : OPTIONAL transformation_select; 
 END_ENTITY;
 
 ENTITY Assembly_definition  -- SBC3
@@ -998,6 +998,13 @@ ENTITY Assembly_relationship_substitution;  -- SBC3
   base_relationship       : Assembly_component_relationship; 
   description             : OPTIONAL STRING; 
   substitute_relationship : Assembly_component_relationship; 
+END_ENTITY;
+
+ENTITY Assigned_id;
+  context     : Organization; 
+  description : OPTIONAL STRING; 
+  id          : STRING; 
+  role        : OPTIONAL STRING; 
 END_ENTITY;
 
 ENTITY Attribute_translation_assignment;  -- GMI4
@@ -1047,8 +1054,9 @@ END_ENTITY;
 
 ENTITY Breakdown_element ABSTRACT  -- SBC2
 SUPERTYPE OF ( ONEOF (Alternative_solution, Product_component, Product_function));
-  id         : STRING; 
-  version_id : OPTIONAL STRING; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  id             : Assigned_id; 
+  version_id     : OPTIONAL STRING; 
 END_ENTITY;
 
 ENTITY Breakdown_element_relationship;  -- SBC2
@@ -1117,12 +1125,13 @@ SUBTYPE OF ( Path_based_path_segment );
 END_ENTITY;
 
 ENTITY Class;  -- GMI5
-  defined_in  : OPTIONAL Class_system; 
-  description : OPTIONAL STRING; 
-  id          : STRING; 
-  name        : OPTIONAL STRING; 
-  source      : OPTIONAL class_source_select; 
-  version_id  : OPTIONAL STRING; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  defined_in     : OPTIONAL Class_system; 
+  description    : OPTIONAL STRING; 
+  id             : Assigned_id; 
+  name           : OPTIONAL STRING; 
+  source         : OPTIONAL class_source_select; 
+  version_id     : OPTIONAL STRING; 
 INVERSE 
   attributes : SET [0:?] OF Class_attribute FOR class; 
 END_ENTITY;
@@ -1135,11 +1144,12 @@ ENTITY Class_assignment;  -- GMI5
 END_ENTITY;
 
 ENTITY Class_attribute;  -- GMI5
+  additional_ids       : OPTIONAL SET [1:?] OF Assigned_id; 
   allowed_values       : OPTIONAL SET [1:?] OF Property; 
   attribute_definition : Property_definition; 
   class                : Class; 
   description          : OPTIONAL STRING; 
-  id                   : STRING; 
+  id                   : Assigned_id; 
   name                 : OPTIONAL STRING; 
 END_ENTITY;
 
@@ -1181,8 +1191,9 @@ ENTITY Class_specification_association;  -- SBC1
 END_ENTITY;
 
 ENTITY Class_system;  -- GMI5
-  description : OPTIONAL STRING; 
-  id          : STRING; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  description    : OPTIONAL STRING; 
+  id             : Assigned_id; 
 INVERSE 
   allowed_classes : SET [0:?] OF Class FOR defined_in; 
 END_ENTITY;
@@ -1223,9 +1234,10 @@ SUBTYPE OF ( Curve );
 END_ENTITY;
 
 ENTITY Contract;  -- GMI2
-  contract_type : STRING; 
-  description   : OPTIONAL STRING; 
-  id            : STRING; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  contract_type  : STRING; 
+  description    : OPTIONAL STRING; 
+  id             : Assigned_id; 
 INVERSE 
   releases : SET [0:?] OF Organization_in_contract FOR signed_contracts; 
 END_ENTITY;
@@ -1310,12 +1322,13 @@ SUBTYPE OF ( Effectivity );
 END_ENTITY;
 
 ENTITY Design_constraint;  -- RR1
-  defined_for  : OPTIONAL Requirement_version; 
-  description  : OPTIONAL STRING; 
-  id           : STRING; 
-  is_valid_for : OPTIONAL SET [1:?] OF Product_class; 
-  name         : OPTIONAL STRING; 
-  version_id   : OPTIONAL STRING; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  defined_for    : OPTIONAL Requirement_version; 
+  description    : OPTIONAL STRING; 
+  id             : Assigned_id; 
+  is_valid_for   : OPTIONAL SET [1:?] OF Product_class; 
+  name           : OPTIONAL STRING; 
+  version_id     : OPTIONAL STRING; 
 END_ENTITY;
 
 ENTITY Design_constraint_association;  -- RR1
@@ -1348,11 +1361,12 @@ ENTITY Direction;  -- SBC3
 END_ENTITY;
 
 ENTITY Document;  -- DM1
-  categories  : OPTIONAL SET [1:?] OF Document_category; 
-  description : OPTIONAL STRING; 
-  id          : STRING; 
-  name        : STRING; 
-  versions    : SET [1:?] OF Document_version; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  categories     : OPTIONAL SET [1:?] OF Document_category; 
+  description    : OPTIONAL STRING; 
+  id             : Assigned_id; 
+  name           : STRING; 
+  versions       : SET [1:?] OF Document_version; 
 END_ENTITY;
 
 ENTITY Document_assignment;  -- DM2
@@ -1372,20 +1386,22 @@ INVERSE
 END_ENTITY;
 
 ENTITY Document_content_property;  -- DM2
+  additional_ids   : OPTIONAL SET [1:?] OF Assigned_id; 
   description      : OPTIONAL STRING; 
   detail_level     : OPTIONAL STRING; 
   geometry_types   : OPTIONAL SET [1:?] OF STRING; 
-  id               : OPTIONAL STRING; 
+  id               : OPTIONAL Assigned_id; 
   languages        : OPTIONAL SET [1:?] OF Language; 
   name             : OPTIONAL STRING; 
   real_world_scale : OPTIONAL Numerical_value; 
 END_ENTITY;
 
 ENTITY Document_creation_property;  -- DM2
+  additional_ids     : OPTIONAL SET [1:?] OF Assigned_id; 
   creating_interface : OPTIONAL STRING; 
   creating_system    : STRING; 
   description        : OPTIONAL STRING; 
-  id                 : OPTIONAL STRING; 
+  id                 : OPTIONAL Assigned_id; 
   name               : OPTIONAL STRING; 
   operating_system   : OPTIONAL STRING; 
 END_ENTITY;
@@ -1412,10 +1428,11 @@ ENTITY Document_definition_relationship;  -- DM2
 END_ENTITY;
 
 ENTITY Document_format_property;  -- DM2
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
   character_code : OPTIONAL STRING; 
   data_format    : OPTIONAL STRING; 
   description    : OPTIONAL STRING; 
-  id             : OPTIONAL STRING; 
+  id             : OPTIONAL Assigned_id; 
   name           : OPTIONAL STRING; 
   size_format    : OPTIONAL Rectangular_size; 
 END_ENTITY;
@@ -1426,17 +1443,19 @@ SUBTYPE OF ( External_source_identification );
 END_ENTITY;
 
 ENTITY Document_size_property;  -- DM2
-  description : OPTIONAL STRING; 
-  file_size   : OPTIONAL Value_with_unit; 
-  id          : OPTIONAL STRING; 
-  name        : OPTIONAL STRING; 
-  page_count  : OPTIONAL Value_with_unit; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  description    : OPTIONAL STRING; 
+  file_size      : OPTIONAL Value_with_unit; 
+  id             : OPTIONAL Assigned_id; 
+  name           : OPTIONAL STRING; 
+  page_count     : OPTIONAL Value_with_unit; 
 END_ENTITY;
 
 ENTITY Document_type_property;  -- DM2
+  additional_ids             : OPTIONAL SET [1:?] OF Assigned_id; 
   description                : OPTIONAL STRING; 
   document_type_name         : STRING; 
-  id                         : OPTIONAL STRING; 
+  id                         : OPTIONAL Assigned_id; 
   name                       : OPTIONAL STRING; 
   used_classification_system : OPTIONAL class_system; 
 END_ENTITY;
@@ -1466,10 +1485,11 @@ END_ENTITY;
 
 ENTITY Effectivity  -- SBC4
 SUPERTYPE OF ( ONEOF (Time_interval_effectivity, Dated_effectivity, Serial_effectivity, Lot_effectivity));
+  additional_ids          : OPTIONAL SET [1:?] OF Assigned_id; 
   concerned_organizations : OPTIONAL SET [1:?] OF Organization; 
   description             : OPTIONAL STRING; 
   effectivity_context     : OPTIONAL STRING; 
-  id                      : OPTIONAL STRING; 
+  id                      : OPTIONAL Assigned_id; 
   version_id              : OPTIONAL STRING; 
 END_ENTITY;
 
@@ -1555,11 +1575,12 @@ END_ENTITY;
 
 ENTITY External_model ABSTRACT  -- DM3
 SUPERTYPE OF ( ONEOF (External_geometric_model, External_picture));
-  description   : OPTIONAL STRING; 
-  id            : STRING; 
-  is_defined_as : Digital_file; 
-  is_defined_in : Cartesian_coordinate_space; 
-  name          : OPTIONAL STRING; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  description    : OPTIONAL STRING; 
+  id             : Assigned_id; 
+  is_defined_as  : Digital_file; 
+  is_defined_in  : Cartesian_coordinate_space; 
+  name           : OPTIONAL STRING; 
 END_ENTITY;
 
 ENTITY External_model_relationship;
@@ -1583,12 +1604,13 @@ END_ENTITY;
 
 ENTITY File ABSTRACT  -- DM2
 SUPERTYPE OF ( ONEOF (Digital_file, Hardcopy));
+  additional_ids    : OPTIONAL SET [1:?] OF Assigned_id; 
   content           : OPTIONAL Document_content_property; 
   creation          : OPTIONAL Document_creation_property; 
   description       : OPTIONAL STRING; 
   file_format       : OPTIONAL Document_format_property; 
   file_type         : OPTIONAL SET [1:?] OF Document_type_property; 
-  id                : STRING; 
+  id                : Assigned_id; 
   ids_and_locations : OPTIONAL SET [1:?] OF File_location; 
   size              : OPTIONAL Document_size_property; 
   version_id        : OPTIONAL STRING; 
@@ -1596,8 +1618,9 @@ END_ENTITY;
 
 ENTITY File_location  -- DM2
 SUBTYPE OF ( External_source_identification );
-  id       : OPTIONAL STRING; 
-  location : Document_location; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  id             : OPTIONAL Assigned_id; 
+  location       : Document_location; 
 END_ENTITY;
 
 ENTITY File_relationship;  -- DM2
@@ -1685,17 +1708,19 @@ SUBTYPE OF ( Transformation_3d );
 END_ENTITY;
 
 ENTITY Information_right;
-  description : OPTIONAL STRING; 
-  id          : STRING; 
-  name        : STRING; 
-  restriction : OPTIONAL STRING; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  description    : OPTIONAL STRING; 
+  id             : Assigned_id; 
+  name           : STRING; 
+  restriction    : OPTIONAL STRING; 
 END_ENTITY;
 
 ENTITY Information_usage_right;
-  description  : OPTIONAL STRING; 
-  grants_right : SET [1:?] OF Information_right; 
-  id           : STRING; 
-  name         : STRING; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  description    : OPTIONAL STRING; 
+  grants_right   : SET [1:?] OF Information_right; 
+  id             : Assigned_id; 
+  name           : STRING; 
 END_ENTITY;
 
 ENTITY Information_usage_right_assignment;
@@ -1751,9 +1776,10 @@ ENTITY Language_indication;  -- GMI4
 END_ENTITY;
 
 ENTITY Library_reference;  -- DM3
-  description  : OPTIONAL STRING; 
-  id           : STRING; 
-  library_type : STRING; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  description    : OPTIONAL STRING; 
+  id             : Assigned_id; 
+  library_type   : STRING; 
 END_ENTITY;
 
 ENTITY Line_curve
@@ -1767,8 +1793,9 @@ SUBTYPE OF ( Path_based_path_segment );
 END_ENTITY;
 
 ENTITY Link_motion_along_path;
+  additional_ids         : OPTIONAL SET [1:?] OF Assigned_id; 
   description            : OPTIONAL STRING; 
-  id                     : OPTIONAL STRING; 
+  id                     : OPTIONAL Assigned_id; 
   items                  : SET [1:?] OF Kinematic_path; 
   name                   : OPTIONAL STRING; 
   representation_context : Cartesian_coordinate_space_with_parameter; 
@@ -1829,7 +1856,8 @@ ENTITY Mated_part_relationship;
 END_ENTITY;
 
 ENTITY Material_identification;  -- C2
-  id             : STRING; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  id             : Assigned_id; 
   is_assigned_to : SET [1:?] OF part_property_select; 
 END_ENTITY;
 
@@ -1854,7 +1882,7 @@ ENTITY Mating_definition
 SUBTYPE OF ( Assembly_definition );
   mating_type : STRING; 
 INVERSE 
-  mated_parts : SET [2:?] OF mated_part_association FOR assembly; 
+  mated_parts : SET [2:?] OF mated_part_association FOR relating; 
 END_ENTITY;
 
 ENTITY Model_property;  -- C1
@@ -1926,12 +1954,12 @@ SUBTYPE OF ( Conic_curve );
 END_ENTITY;
 
 ENTITY Part;  -- PI1
-  categories  : SET [1:?] OF Part_category; 
-  description : OPTIONAL STRING; 
-  id          : STRING; 
-  id_owner    : Organization; 
-  name        : STRING; 
-  versions    : SET [1:?] OF Part_version; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  categories     : SET [1:?] OF Part_category; 
+  description    : OPTIONAL STRING; 
+  id             : Assigned_id; 
+  name           : STRING; 
+  versions       : SET [1:?] OF Part_version; 
 END_ENTITY;
 
 ENTITY Part_category;  -- PI1
@@ -1952,9 +1980,10 @@ END_ENTITY;
 
 ENTITY Part_instance ABSTRACT  -- SBC3
 SUPERTYPE OF ( ONEOF (Quantified_part_instance, Selected_part_instance, Single_part_instance, Specified_part_instance));
-  definition  : part_instance_definition_select; 
-  description : OPTIONAL STRING; 
-  id          : STRING; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  definition     : part_instance_definition_select; 
+  description    : OPTIONAL STRING; 
+  id             : Assigned_id; 
 END_ENTITY;
 
 ENTITY Part_instance_relationship  -- SBC2
@@ -1971,10 +2000,11 @@ SUBTYPE OF ( Property_assignment );
 END_ENTITY;
 
 ENTITY Part_shape;  -- C3
+  additional_ids   : OPTIONAL SET [1:?] OF Assigned_id; 
   described_object : part_information_select; 
   description      : OPTIONAL STRING; 
   elements         : OPTIONAL SET [1:?] OF Shape_element; 
-  id               : OPTIONAL STRING; 
+  id               : OPTIONAL Assigned_id; 
 END_ENTITY;
 
 ENTITY Part_version;  -- PI1
@@ -2025,8 +2055,9 @@ SUBTYPE OF ( Kinematic_path_segment );
 END_ENTITY;
 
 ENTITY Path_parameter_set;
+  additional_ids    : OPTIONAL SET [1:?] OF Assigned_id; 
   description       : OPTIONAL STRING; 
-  id                : OPTIONAL STRING; 
+  id                : OPTIONAL Assigned_id; 
   name              : OPTIONAL STRING; 
   parameter_context : Cartesian_coordinate_space_2d; 
   parameters        : SET [1:?] OF B_spline_curve; 
@@ -2044,11 +2075,12 @@ INVERSE
 END_ENTITY;
 
 ENTITY Person_in_organization;  -- GMI1
-  id           : OPTIONAL STRING; 
-  location     : OPTIONAL Address; 
-  organization : Organization; 
-  person       : Person; 
-  role         : STRING; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  id             : OPTIONAL Assigned_id; 
+  location       : OPTIONAL Address; 
+  organization   : Organization; 
+  person         : Person; 
+  role           : STRING; 
 END_ENTITY;
 
 ENTITY Person_in_organization_relationship;  -- GMI1
@@ -2070,8 +2102,9 @@ SUBTYPE OF ( Physical_representation );
 END_ENTITY;
 
 ENTITY Physical_instance;  -- PPP1
+  additional_ids    : OPTIONAL SET [1:?] OF Assigned_id; 
   description       : OPTIONAL STRING; 
-  id                : STRING; 
+  id                : Assigned_id; 
   inventory_number  : OPTIONAL STRING; 
   is_realization_of : OPTIONAL physical_instance_definition_select; 
   lot_id            : OPTIONAL STRING; 
@@ -2079,8 +2112,9 @@ ENTITY Physical_instance;  -- PPP1
 END_ENTITY;
 
 ENTITY Physical_instance_test_result;  -- PPP1
+  additional_ids  : OPTIONAL SET [1:?] OF Assigned_id; 
   description     : OPTIONAL STRING; 
-  id              : STRING; 
+  id              : Assigned_id; 
   test_activity   : OPTIONAL test_activity_select; 
   test_results    : OPTIONAL SET [1:?] OF Property; 
   tested_instance : Physical_instance; 
@@ -2118,11 +2152,12 @@ SUBTYPE OF ( Path_based_path_segment );
 END_ENTITY;
 
 ENTITY Process_operation_definition;
-  description  : OPTIONAL STRING; 
-  id           : STRING; 
-  name         : OPTIONAL STRING; 
-  process_type : STRING; 
-  version_id   : OPTIONAL STRING; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  description    : OPTIONAL STRING; 
+  id             : Assigned_id; 
+  name           : OPTIONAL STRING; 
+  process_type   : STRING; 
+  version_id     : OPTIONAL STRING; 
 END_ENTITY;
 
 ENTITY Process_operation_definition_relationship;
@@ -2136,16 +2171,17 @@ ENTITY Process_operation_input_or_output;
   concerned_shapes : OPTIONAL SET [1:?] OF shape_element; 
   description      : OPTIONAL STRING; 
   element          : process_operation_input_or_output_select; 
-  operation        : Process_operation_occurrence; 
+  OPERATION        : Process_operation_occurrence; 
   placement        : OPTIONAL transformation; 
   role             : STRING; 
 END_ENTITY;
 
 ENTITY Process_operation_occurrence;
-  defined_in : OPTIONAL Cartesian_coordinate_space; 
-  definition : Process_operation_definition; 
-  id         : STRING; 
-  plan       : Process_plan; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  defined_in     : OPTIONAL Cartesian_coordinate_space; 
+  definition     : Process_operation_definition; 
+  id             : Assigned_id; 
+  plan           : Process_plan; 
 END_ENTITY;
 
 ENTITY Process_operation_occurrence_relationship;
@@ -2166,8 +2202,9 @@ ENTITY Process_operation_resource_assignment;
 END_ENTITY;
 
 ENTITY Process_plan;
+  additional_ids   : OPTIONAL SET [1:?] OF Assigned_id; 
   description      : OPTIONAL STRING; 
-  id               : STRING; 
+  id               : Assigned_id; 
   name             : OPTIONAL STRING; 
   produced_outputs : OPTIONAL SET [1:?] OF Part_version; 
   version_id       : OPTIONAL STRING; 
@@ -2190,8 +2227,9 @@ SUBTYPE OF ( Part_version_view_relationship );
 END_ENTITY;
 
 ENTITY Product_class;  -- SBC1
+  additional_ids      : OPTIONAL SET [1:?] OF Assigned_id; 
   description         : OPTIONAL STRING; 
-  id                  : STRING; 
+  id                  : Assigned_id; 
   level_type          : OPTIONAL STRING; 
   market_name         : OPTIONAL STRING; 
   market_segment_type : OPTIONAL STRING; 
@@ -2216,9 +2254,10 @@ SUBTYPE OF ( Breakdown_element );
 END_ENTITY;
 
 ENTITY Product_configuration;  -- SBC4
+  additional_ids          : OPTIONAL SET [1:?] OF Assigned_id; 
   defining_specifications : OPTIONAL SET [1:?] OF Specification; 
   description             : OPTIONAL STRING; 
-  id                      : STRING; 
+  id                      : Assigned_id; 
   member_of               : Product_class; 
   name                    : OPTIONAL STRING; 
   version_id              : OPTIONAL STRING; 
@@ -2255,8 +2294,9 @@ END_ENTITY;
 ENTITY Project;  -- GMI2
   actual_end_date           : OPTIONAL Date_time; 
   actual_start_date         : OPTIONAL Date_time; 
+  additional_ids            : OPTIONAL SET [1:?] OF Assigned_id; 
   description               : OPTIONAL STRING; 
-  id                        : STRING; 
+  id                        : Assigned_id; 
   name                      : STRING; 
   planned_end_date          : OPTIONAL period_or_date_select; 
   planned_start_date        : OPTIONAL event_or_date_select; 
@@ -2299,19 +2339,21 @@ END_ENTITY;
 
 ENTITY Property_change;  -- C1
   added_properties   : OPTIONAL SET [1:?] OF Property; 
+  additional_ids     : OPTIONAL SET [1:?] OF Assigned_id; 
   deleted_properties : OPTIONAL SET [1:?] OF Property; 
   described_change   : changed_relationship_select; 
   description        : STRING; 
-  id                 : OPTIONAL STRING; 
+  id                 : OPTIONAL Assigned_id; 
 END_ENTITY;
 
 ENTITY Property_definition ABSTRACT  -- C1
 SUPERTYPE OF ( ONEOF (Cost_property_definition, Duration_property_definition, General_property_definition, Mass_property_definition, Material_property_definition, Quality_property_definition, Recyclability_property_definition));
-  allowed_units : OPTIONAL SET [1:?] OF Unit; 
-  description   : OPTIONAL STRING; 
-  id            : STRING; 
-  source        : OPTIONAL property_source_select; 
-  version_id    : OPTIONAL STRING; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  allowed_units  : OPTIONAL SET [1:?] OF Unit; 
+  description    : OPTIONAL STRING; 
+  id             : Assigned_id; 
+  source         : OPTIONAL property_source_select; 
+  version_id     : OPTIONAL STRING; 
 END_ENTITY;
 
 ENTITY Property_definition_relationship;  -- C1
@@ -2363,17 +2405,19 @@ SUBTYPE OF ( Part_version_view_relationship );
 END_ENTITY;
 
 ENTITY Requirement;  -- RR1
-  description : OPTIONAL STRING; 
-  id          : STRING; 
-  name        : STRING; 
-  owner       : OPTIONAL person_organization_select; 
-  versions    : SET [1:?] OF Requirement_version; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  description    : OPTIONAL STRING; 
+  id             : Assigned_id; 
+  name           : STRING; 
+  owner          : OPTIONAL person_organization_select; 
+  versions       : SET [1:?] OF Requirement_version; 
 END_ENTITY;
 
 ENTITY Requirement_assignment;
+  additional_ids       : OPTIONAL SET [1:?] OF Assigned_id; 
   assigned_requirement : requirement_or_version_select; 
   description          : OPTIONAL STRING; 
-  id                   : OPTIONAL STRING; 
+  id                   : OPTIONAL Assigned_id; 
   is_assigned_to       : SET [1:?] OF requirement_assignment_select; 
 END_ENTITY;
 
@@ -2386,9 +2430,10 @@ SUBTYPE OF ( Requirement_version_relationship );
 END_ENTITY;
 
 ENTITY Requirement_satisfaction_assertion;  -- RR1
+  additional_ids        : OPTIONAL SET [1:?] OF Assigned_id; 
   asserted_by           : OPTIONAL SET [1:?] OF date_and_person_organization; 
   description           : OPTIONAL STRING; 
-  id                    : OPTIONAL STRING; 
+  id                    : OPTIONAL Assigned_id; 
   related_assignment    : OPTIONAL Requirement_assignment; 
   satisfied_by          : SET [1:?] OF requirement_satisfaction_select; 
   satisfied_requirement : requirement_or_version_select; 
@@ -2400,9 +2445,10 @@ SUBTYPE OF ( Requirement_version_relationship );
 END_ENTITY;
 
 ENTITY Requirement_source_association;  -- RR1
+  additional_ids      : OPTIONAL SET [1:?] OF Assigned_id; 
   associated_sources  : SET [1:?] OF requirement_source_select; 
   description         : OPTIONAL STRING; 
-  id                  : OPTIONAL STRING; 
+  id                  : OPTIONAL Assigned_id; 
   sourced_requirement : requirement_or_version_select; 
 END_ENTITY;
 
@@ -2419,10 +2465,11 @@ END_ENTITY;
 
 ENTITY Requirement_version_relationship ABSTRACT  -- RR1
 SUPERTYPE OF ( ONEOF (General_requirement_version_relationship, Requirement_sequence_relationship, Requirement_tracing_relationship, Requirement_collection_relationship, Requirement_decomposition_relationship));
-  description : OPTIONAL STRING; 
-  id          : OPTIONAL STRING; 
-  related     : SET [1:?] OF Requirement_version; 
-  relating    : Requirement_version; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  description    : OPTIONAL STRING; 
+  id             : OPTIONAL Assigned_id; 
+  related        : SET [1:?] OF Requirement_version; 
+  relating       : Requirement_version; 
 END_ENTITY;
 
 ENTITY Retention_period;  -- GMI1
@@ -2439,9 +2486,10 @@ SUBTYPE OF ( Part_instance_relationship );
 END_ENTITY;
 
 ENTITY Security_classification;  -- GMI5
-  description : OPTIONAL STRING; 
-  level       : STRING; 
-  name        : STRING; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  description    : OPTIONAL STRING; 
+  id             : Assigned_id; 
+  level          : STRING; 
 END_ENTITY;
 
 ENTITY Security_classification_assignment;
@@ -2484,9 +2532,10 @@ END_ENTITY;
 
 ENTITY Shape_element  -- C3
 SUPERTYPE OF (Coating_layer);
-  description : OPTIONAL STRING; 
-  id          : OPTIONAL STRING; 
-  name        : OPTIONAL STRING; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  description    : OPTIONAL STRING; 
+  id             : OPTIONAL Assigned_id; 
+  name           : OPTIONAL STRING; 
 INVERSE 
   containing_shape : Part_shape FOR elements; 
 END_ENTITY;
@@ -2509,17 +2558,19 @@ SUBTYPE OF ( Part_instance );
 END_ENTITY;
 
 ENTITY Specification;  -- SBC1
-  category    : Specification_category; 
-  description : OPTIONAL STRING; 
-  id          : STRING; 
-  name        : OPTIONAL STRING; 
-  package     : BOOLEAN; 
-  version_id  : OPTIONAL STRING; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  category       : Specification_category; 
+  description    : OPTIONAL STRING; 
+  id             : Assigned_id; 
+  name           : OPTIONAL STRING; 
+  package        : BOOLEAN; 
+  version_id     : OPTIONAL STRING; 
 END_ENTITY;
 
 ENTITY Specification_category;  -- SBC1
+  additional_ids               : OPTIONAL SET [1:?] OF Assigned_id; 
   description                  : STRING; 
-  id                           : STRING; 
+  id                           : Assigned_id; 
   implicit_exclusive_condition : BOOLEAN; 
 END_ENTITY;
 
@@ -2529,15 +2580,17 @@ ENTITY Specification_category_hierarchy;  -- SBC1
 END_ENTITY;
 
 ENTITY Specification_expression;  -- SBC1
-  description   : OPTIONAL STRING; 
-  id            : OPTIONAL STRING; 
-  operands      : SET [1:?] OF specification_operand_select; 
-  the_operation : STRING; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  description    : OPTIONAL STRING; 
+  id             : OPTIONAL Assigned_id; 
+  operands       : SET [1:?] OF specification_operand_select; 
+  the_operation  : STRING; 
 END_ENTITY;
 
 ENTITY Specification_inclusion;  -- SBC1
+  additional_ids         : OPTIONAL SET [1:?] OF Assigned_id; 
   description            : OPTIONAL STRING; 
-  id                     : OPTIONAL STRING; 
+  id                     : OPTIONAL Assigned_id; 
   if_condition           : specification_operand_select; 
   included_specification : specification_operand_select; 
 END_ENTITY;
@@ -2574,23 +2627,26 @@ SUBTYPE OF ( Alternative_solution );
 END_ENTITY;
 
 ENTITY Template_instance;  -- SBC3
-  definition : template_definition_select; 
-  id         : STRING; 
-  name       : OPTIONAL STRING; 
-  origin     : Axis_placement; 
-  scale      : OPTIONAL REAL; 
-  target     : explicit_transformation_select; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  definition     : template_definition_select; 
+  id             : Assigned_id; 
+  name           : OPTIONAL STRING; 
+  origin         : Axis_placement; 
+  scale          : OPTIONAL REAL; 
+  target         : explicit_transformation_select; 
 END_ENTITY;
 
 ENTITY Text_specification;  -- RR1
-  description : STRING; 
-  id          : OPTIONAL STRING; 
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  description    : STRING; 
+  id             : OPTIONAL Assigned_id; 
 END_ENTITY;
 
 ENTITY Time_interval;  -- GMI1
+  additional_ids   : OPTIONAL SET [1:?] OF Assigned_id; 
   description      : OPTIONAL STRING; 
   end_definition   : period_or_date_select; 
-  id               : OPTIONAL STRING; 
+  id               : OPTIONAL Assigned_id; 
   name             : OPTIONAL STRING; 
   start_definition : event_or_date_select; 
 END_ENTITY;
@@ -2664,8 +2720,9 @@ SUBTYPE OF ( Property_value );
 END_ENTITY;
 
 ENTITY Work_order;  -- AWM2
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
   description    : OPTIONAL STRING; 
-  id             : STRING; 
+  id             : Assigned_id; 
   in_response_to : OPTIONAL SET [1:?] OF Work_request; 
   is_controlling : SET [1:?] OF Activity; 
   order_type     : STRING; 
@@ -2673,8 +2730,9 @@ ENTITY Work_order;  -- AWM2
 END_ENTITY;
 
 ENTITY Work_request;  -- AWM2
+  additional_ids   : OPTIONAL SET [1:?] OF Assigned_id; 
   description      : OPTIONAL STRING; 
-  id               : STRING; 
+  id               : Assigned_id; 
   notified_persons : OPTIONAL SET [1:?] OF Date_and_person_organization; 
   request_type     : STRING; 
   requestor        : Date_and_person_organization; 
