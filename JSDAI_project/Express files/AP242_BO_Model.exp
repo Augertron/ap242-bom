@@ -1,7 +1,7 @@
 SCHEMA AP242_BO_Model;
 
--- Version: 1.0 first internal draft
--- Generation time: 2011-08-24T07:22:41+01:00
+-- Version: 1.0 second internal draft
+-- Generation time: 2011-08-24T21:39:27+01:00
 
 TYPE limit_qualifier = STRING; END_TYPE;
 TYPE quantity = STRING; END_TYPE;
@@ -43,9 +43,11 @@ TYPE activity_assignment_select = SELECT (
   Activity_relationship,
   Alternate_part_relationship,
   Assembly_relationship_substitution,
+  Breakdown,
   Breakdown_element,
+  Breakdown_realization_relationship,
+  Breakdown_version,
   Class,
-  Class_breakdown_association,
   Class_category_association,
   Class_condition_association,
   Class_inclusion_association,
@@ -74,7 +76,6 @@ TYPE activity_assignment_select = SELECT (
   Process_plan,
   Product_class,
   Product_configuration,
-  Product_structure_relationship,
   Project,
   Project_assignment,
   Project_relationship,
@@ -124,11 +125,13 @@ TYPE approval_element_select = SELECT (
   Activity_method_work_request_association,
   Alternate_part_relationship,
   Assembly_relationship_substitution,
+  Breakdown,
   Breakdown_element,
+  Breakdown_realization_relationship,
+  Breakdown_version,
   Certification,
   Class,
   Class_assignment,
-  Class_breakdown_association,
   Class_category_association,
   Class_condition_association,
   Class_inclusion_association,
@@ -161,7 +164,6 @@ TYPE approval_element_select = SELECT (
   Process_plan,
   Product_class,
   Product_configuration,
-  Product_structure_relationship,
   Project,
   Property_assignment,
   Property_definition,
@@ -187,10 +189,21 @@ TYPE assigned_document_select = SELECT (
 );
 END_TYPE;
 
-TYPE breakdown_element_select = SELECT ( 
+TYPE breakdown_element_or_alternative_solution_select = SELECT ( 
   Alternative_solution,
-  Product_component,
-  Product_function
+  Breakdown_element
+);
+END_TYPE;
+
+TYPE breakdown_element_or_part_instance_select = SELECT ( 
+  Breakdown_element,
+  Part_instance
+);
+END_TYPE;
+
+TYPE breakdown_element_select = SELECT ( 
+  General_breakdown_element,
+  Physical_breakdown_element
 );
 END_TYPE;
 
@@ -205,9 +218,14 @@ END_TYPE;
 
 TYPE changed_relationship_select = SELECT ( 
   Activity_relationship,
-  Breakdown_element_relationship,
   Design_constraint_relationship,
+  Functional_breakdown_element_decomposition_relationship,
+  Functional_breakdown_element_relationship,
+  General_breakdown_element_decomposition_relationship,
+  General_breakdown_element_relationship,
   Part_version_relationship,
+  Physical_breakdown_element_decomposition_relationship,
+  Physical_breakdown_element_relationship,
   Process_operation_occurrence_relationship,
   Process_plan_relationship,
   Replaced_usage_relationship,
@@ -290,11 +308,10 @@ END_TYPE;
 
 TYPE configured_item_select = SELECT ( 
   Alternative_solution,
+  Breakdown_element,
   Part_instance,
   Process_operation_occurrence,
-  Process_plan,
-  Product_component,
-  Product_function
+  Process_plan
 );
 END_TYPE;
 
@@ -328,11 +345,13 @@ TYPE documented_element_select = SELECT (
   Activity_assignment,
   Activity_method,
   Approval,
+  Breakdown,
   Breakdown_element,
+  Breakdown_realization_relationship,
+  Breakdown_version,
   Certification,
   Class,
   Class_attribute,
-  Class_breakdown_association,
   Class_system,
   Contract,
   Design_constraint,
@@ -358,7 +377,6 @@ TYPE documented_element_select = SELECT (
   Process_plan,
   Product_class,
   Product_configuration,
-  Product_structure_relationship,
   Project,
   Property,
   Property_change,
@@ -380,10 +398,11 @@ END_TYPE;
 TYPE effective_element_select = SELECT ( 
   Assembly_component_relationship,
   Assembly_relationship_substitution,
+  Breakdown,
   Breakdown_element,
-  Breakdown_element_relationship,
+  Breakdown_realization_relationship,
+  Breakdown_version,
   Class,
-  Class_breakdown_association,
   Class_category_association,
   Class_condition_association,
   Class_inclusion_association,
@@ -396,6 +415,10 @@ TYPE effective_element_select = SELECT (
   Document_definition_relationship,
   Document_version,
   File,
+  Functional_breakdown_element_decomposition_relationship,
+  Functional_breakdown_element_relationship,
+  General_breakdown_element_decomposition_relationship,
+  General_breakdown_element_relationship,
   Geometric_model,
   Part,
   Part_instance,
@@ -403,6 +426,8 @@ TYPE effective_element_select = SELECT (
   part_version_or_view_select,
   Part_version_view_instance_relationship,
   Part_version_view_relationship,
+  Physical_breakdown_element_decomposition_relationship,
+  Physical_breakdown_element_relationship,
   Process_operation_definition,
   Process_operation_definition_relationship,
   Process_operation_occurrence,
@@ -411,7 +436,6 @@ TYPE effective_element_select = SELECT (
   Process_plan,
   Product_class,
   Product_configuration,
-  Product_structure_relationship,
   Property_assignment,
   Property_definition,
   Replaced_usage_relationship,
@@ -427,7 +451,7 @@ END_TYPE;
 
 TYPE event_or_date_select = SELECT ( 
   Date_time,
-  EVENT
+  Event
 );
 END_TYPE;
 
@@ -450,14 +474,16 @@ TYPE general_organizational_data_select = SELECT (
   Activity_method_work_request_association,
   Alias_identification,
   Alternate_part_relationship,
+  Alternative_solution_relationship,
   Approval,
   Assembly_relationship_substitution,
+  Breakdown,
   Breakdown_element,
-  Breakdown_element_relationship,
+  Breakdown_realization_relationship,
+  Breakdown_version,
   Certification,
   Class,
   Class_assignment,
-  Class_breakdown_association,
   Class_category_association,
   Class_condition_association,
   Class_inclusion_association,
@@ -471,6 +497,10 @@ TYPE general_organizational_data_select = SELECT (
   Document_type_property,
   Document_version,
   File,
+  Functional_breakdown_element_decomposition_relationship,
+  Functional_breakdown_element_relationship,
+  General_breakdown_element_decomposition_relationship,
+  General_breakdown_element_relationship,
   Geometric_model,
   Information_usage_right,
   Manufacturing_configuration,
@@ -487,6 +517,8 @@ TYPE general_organizational_data_select = SELECT (
   Person_in_organization,
   Person_in_organization_relationship,
   Physical_assembly_relationship,
+  Physical_breakdown_element_decomposition_relationship,
+  Physical_breakdown_element_relationship,
   Physical_instance,
   Physical_instance_test_result,
   Process_operation_definition,
@@ -495,7 +527,6 @@ TYPE general_organizational_data_select = SELECT (
   Process_plan,
   Product_class,
   Product_configuration,
-  Product_structure_relationship,
   Project,
   Property,
   Property_assignment,
@@ -529,9 +560,9 @@ TYPE information_usage_right_select = SELECT (
 END_TYPE;
 
 TYPE instance_usage_context_select = SELECT ( 
+  Breakdown_realization_relationship,
   Part_version_view_instance_relationship,
-  Process_operation_input_or_output,
-  Product_structure_relationship
+  Process_operation_input_or_output
 );
 END_TYPE;
 
@@ -551,8 +582,8 @@ END_TYPE;
 TYPE part_information_select = SELECT ( 
   Part_instance,
   part_version_or_view_select,
-  Physical_instance,
-  Product_component
+  Physical_breakdown_element,
+  Physical_instance
 );
 END_TYPE;
 
@@ -564,6 +595,7 @@ END_TYPE;
 
 TYPE part_property_select = SELECT ( 
   Breakdown_element,
+  Breakdown_realization_relationship,
   Design_constraint,
   Document_definition,
   Document_definition_relationship,
@@ -577,7 +609,6 @@ TYPE part_property_select = SELECT (
   Physical_instance,
   Product_class,
   Product_configuration,
-  Product_structure_relationship,
   Shape_element,
   Shape_element_relationship,
   Specification
@@ -593,13 +624,20 @@ END_TYPE;
 TYPE period_or_date_select = SELECT ( 
   Date_time,
   Duration,
-  EVENT
+  Event
 );
 END_TYPE;
 
 TYPE person_organization_select = SELECT ( 
   Organization,
   Person_in_organization
+);
+END_TYPE;
+
+TYPE physical_element_select = SELECT ( 
+  Alternative_solution,
+  part_version_or_view_select,
+  Physical_breakdown_element
 );
 END_TYPE;
 
@@ -629,15 +667,16 @@ TYPE process_property_select = SELECT (
 END_TYPE;
 
 TYPE product_constituent_select = SELECT ( 
-  Part_instance,
-  Product_component,
-  Product_function
+  Breakdown,
+  Part_instance
 );
 END_TYPE;
 
 TYPE project_information_select = SELECT ( 
   Activity,
+  Breakdown,
   Breakdown_element,
+  Breakdown_version,
   Document,
   Document_version,
   Part,
@@ -706,8 +745,8 @@ END_TYPE;
 TYPE resource_definition_select = SELECT ( 
   Part_instance,
   part_version_or_view_select,
+  Physical_breakdown_element,
   Physical_instance,
-  Product_component,
   Text_specification
 );
 END_TYPE;
@@ -725,8 +764,10 @@ TYPE security_classification_select = SELECT (
   Activity_assignment,
   Assembly_component_relationship,
   Assembly_relationship_substitution,
+  Breakdown,
   Breakdown_element,
-  Class_breakdown_association,
+  Breakdown_realization_relationship,
+  Breakdown_version,
   Class_system,
   Configuration,
   Design_constraint,
@@ -745,7 +786,6 @@ TYPE security_classification_select = SELECT (
   Physical_instance_test_result,
   Process_plan,
   Product_class,
-  Product_structure_relationship,
   Project,
   Property_assignment,
   Property_definition,
@@ -945,9 +985,19 @@ ENTITY Alternate_part_relationship;  -- PI1
 END_ENTITY;
 
 ENTITY Alternative_solution  -- SBC2
-SUPERTYPE OF ( ONEOF (Final_solution, Supplier_solution, Technical_solution))
-SUBTYPE OF ( Breakdown_element );
-  base_element : breakdown_element; 
+SUPERTYPE OF ( ONEOF (Final_solution, Supplier_solution, Technical_solution));
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  description    : OPTIONAL STRING; 
+  id             : Assigned_id; 
+  name           : STRING; 
+  version_id     : STRING; 
+END_ENTITY;
+
+ENTITY Alternative_solution_relationship;  -- SBC2
+  description   : OPTIONAL STRING; 
+  related       : Alternative_solution; 
+  relating      : Alternative_solution; 
+  relation_type : STRING; 
 END_ENTITY;
 
 ENTITY Application_context;  -- PI2
@@ -1000,10 +1050,10 @@ ENTITY Assembly_relationship_substitution;  -- SBC3
   substitute_relationship : Assembly_component_relationship; 
 END_ENTITY;
 
-ENTITY Assigned_id;
-  id_context     : Organization; 
+ENTITY Assigned_id;  -- GMI1
   description : OPTIONAL STRING; 
   id          : STRING; 
+  id_context  : Organization; 
   role        : OPTIONAL STRING; 
 END_ENTITY;
 
@@ -1036,7 +1086,7 @@ SUPERTYPE OF ( ONEOF (Axis1_placement, Axis2_placement_2d, Axis2_placement_3d));
   name     : OPTIONAL STRING; 
 END_ENTITY;
 
-ENTITY B_spline_curve
+ENTITY B_spline_curve  -- K2
 SUPERTYPE OF ( ONEOF (Curve_with_explicit_knots, Curve_with_implicit_knots))
 SUBTYPE OF ( Curve );
   closed         : BOOLEAN; 
@@ -1045,24 +1095,48 @@ SUBTYPE OF ( Curve );
   weight_values  : OPTIONAL LIST [2:?] OF REAL; 
 END_ENTITY;
 
-ENTITY Breakdown;  -- SBC2
-  association_type   : STRING; 
-  breakdown_elements : SET [1:?] OF breakdown_element_select; 
-  breakdown_of       : root_element_select; 
-  description        : OPTIONAL STRING; 
+ENTITY Breakdown ABSTRACT
+SUPERTYPE OF ( ONEOF (Physical_breankdown, Functional_breankdown, General_breankdown));
+  additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  description    : OPTIONAL STRING; 
+  id             : Assigned_id; 
+  name           : STRING; 
+  versions       : SET [1:?] OF Breakdown_version; 
 END_ENTITY;
 
 ENTITY Breakdown_element ABSTRACT  -- SBC2
-SUPERTYPE OF ( ONEOF (Alternative_solution, Product_component, Product_function));
+SUPERTYPE OF ( ONEOF (Functional_breakdown_element, Physical_breakdown_element, General_breakdown_element));
   additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
+  description    : OPTIONAL STRING; 
   id             : Assigned_id; 
-  version_id     : OPTIONAL STRING; 
+  name           : STRING; 
+  version_id     : STRING; 
 END_ENTITY;
 
-ENTITY Breakdown_element_relationship;  -- SBC2
+ENTITY Breakdown_occurrence_relationship;  -- SBC2
+  description : OPTIONAL STRING; 
+  related     : breakdown_element_select; 
+  relating    : breakdown_element_or_alternative_solution_select; 
+END_ENTITY;
+
+ENTITY Breakdown_realization_relationship;  -- SBC2
+  description : OPTIONAL STRING; 
+  related     : breakdown_element_or_part_instance_select; 
+  relating    : breakdown_element_or_alternative_solution_select; 
+END_ENTITY;
+
+ENTITY Breakdown_version;  -- SBC2
+  additional_elements : OPTIONAL SET [1:?] OF Breakdown_element; 
+  breakdown_of        : OPTIONAL root_element_select; 
+  description         : OPTIONAL STRING; 
+  id                  : STRING; 
+  top_element         : Breakdown_element; 
+END_ENTITY;
+
+ENTITY Breakdown_version_relationship;  -- SBC2
   description   : OPTIONAL STRING; 
-  related       : Breakdown_element; 
-  relating      : Breakdown_element; 
+  related       : Breakdown_version; 
+  relating      : Breakdown_version; 
   relation_type : STRING; 
 END_ENTITY;
 
@@ -1080,7 +1154,7 @@ SUPERTYPE OF (Cartesian_coordinate_space_with_parameter)
 SUBTYPE OF ( Cartesian_coordinate_space );
 END_ENTITY;
 
-ENTITY Cartesian_coordinate_space_with_parameter
+ENTITY Cartesian_coordinate_space_with_parameter  -- K2
 SUBTYPE OF ( Cartesian_coordinate_space_3d );
   unit : OPTIONAL Unit; 
 END_ENTITY;
@@ -1114,12 +1188,12 @@ ENTITY Characteristic_assignment;
   description              : OPTIONAL STRING; 
 END_ENTITY;
 
-ENTITY Circle
+ENTITY Circle  -- K2
 SUBTYPE OF ( Conic_curve );
   radius : Numerical_value; 
 END_ENTITY;
 
-ENTITY Circular_path
+ENTITY Circular_path  -- K2
 SUBTYPE OF ( Path_based_path_segment );
   via_point : Cartesian_point; 
 END_ENTITY;
@@ -1151,13 +1225,6 @@ ENTITY Class_attribute;  -- GMI5
   description          : OPTIONAL STRING; 
   id                   : Assigned_id; 
   name                 : OPTIONAL STRING; 
-END_ENTITY;
-
-ENTITY Class_breakdown_association;  -- SBC2
-  associated_breakdown_element : breakdown_element_select; 
-  associated_product_class     : Product_class; 
-  association_type             : STRING; 
-  description                  : OPTIONAL STRING; 
 END_ENTITY;
 
 ENTITY Class_category_association;  -- SBC1
@@ -1215,9 +1282,9 @@ INVERSE
 END_ENTITY;
 
 ENTITY Component_placement;  -- SBC2
-  placed_component    : Product_component; 
+  placed_component    : Physical_breakdown_element; 
   placement           : transformation_select; 
-  reference_component : Product_component; 
+  reference_component : Physical_breakdown_element; 
 END_ENTITY;
 
 ENTITY Configuration;  -- SBC4
@@ -1227,7 +1294,7 @@ ENTITY Configuration;  -- SBC4
   is_solution_for    : configured_specification_select; 
 END_ENTITY;
 
-ENTITY Conic_curve ABSTRACT
+ENTITY Conic_curve ABSTRACT  -- K2
 SUPERTYPE OF ( ONEOF (Circle, Ellipse, Parabola, Hyperbola))
 SUBTYPE OF ( Curve );
   position : Axis_placement; 
@@ -1251,30 +1318,30 @@ ENTITY Cost_property_definition  -- C1
 SUBTYPE OF ( Property_definition );
 END_ENTITY;
 
-ENTITY Curve ABSTRACT
+ENTITY Curve ABSTRACT  -- K2
 SUPERTYPE OF ( ONEOF (B_spline_curve, Line_curve, Conic_curve));
   name : OPTIONAL STRING; 
 END_ENTITY;
 
-ENTITY Curve_based_path
+ENTITY Curve_based_path  -- K2
 SUBTYPE OF ( Path_based_path_segment );
   curve_path : Curve; 
 END_ENTITY;
 
-ENTITY Curve_based_path_segment
+ENTITY Curve_based_path_segment  -- K2
 SUBTYPE OF ( Kinematic_path_segment );
   orientation : B_spline_curve; 
   parameters  : OPTIONAL Path_parameter_set; 
   position    : B_spline_curve; 
 END_ENTITY;
 
-ENTITY Curve_with_explicit_knots
+ENTITY Curve_with_explicit_knots  -- K2
 SUBTYPE OF ( B_spline_curve );
   knot_multiplicities : LIST [2:?] OF INTEGER; 
   knot_values         : LIST [2:?] OF REAL; 
 END_ENTITY;
 
-ENTITY Curve_with_implicit_knots
+ENTITY Curve_with_implicit_knots  -- K2
 SUBTYPE OF ( B_spline_curve );
   knot_type : knot_type_enum; 
 END_ENTITY;
@@ -1515,7 +1582,7 @@ ENTITY Element_delivery;  -- AWM1
   role                 : STRING; 
 END_ENTITY;
 
-ENTITY Ellipse
+ENTITY Ellipse  -- K2
 SUBTYPE OF ( Conic_curve );
   first_semi_axis  : Numerical_value; 
   second_semi_axis : Numerical_value; 
@@ -1630,15 +1697,62 @@ ENTITY File_relationship;  -- DM2
   relation_type : STRING; 
 END_ENTITY;
 
-ENTITY Final_solution  -- SBC2
+ENTITY Final_solution
 SUBTYPE OF ( Alternative_solution );
   specifications : SET [1:?] OF final_definition_select; 
   status         : STRING; 
 END_ENTITY;
 
+ENTITY Functional_breakdown_element  -- SBC2
+SUBTYPE OF ( Breakdown_element );
+END_ENTITY;
+
+ENTITY Functional_breakdown_element_association;  -- SBC2
+  associated_functional_element : Functional_breakdown_element; 
+  associated_physical_element   : physical_element_select; 
+END_ENTITY;
+
+ENTITY Functional_breakdown_element_decomposition_relationship;  -- SBC2
+  related  : Functional_breakdown_element; 
+  relating : Functional_breakdown_element; 
+END_ENTITY;
+
+ENTITY Functional_breakdown_element_relationship;  -- SBC2
+  description   : OPTIONAL STRING; 
+  related       : Functional_breakdown_element; 
+  relating      : Functional_breakdown_element; 
+  relation_type : STRING; 
+END_ENTITY;
+
+ENTITY Functional_breankdown  -- SBC2
+SUBTYPE OF ( Breakdown );
+END_ENTITY;
+
 ENTITY General_assembly_component_relationship  -- SBC3
 SUBTYPE OF ( Assembly_component_relationship );
   relation_type : STRING; 
+END_ENTITY;
+
+ENTITY General_breakdown_element  -- SBC2
+SUBTYPE OF ( Breakdown_element );
+  breakdown_element_type : STRING; 
+END_ENTITY;
+
+ENTITY General_breakdown_element_decomposition_relationship;  -- SBC2
+  related  : General_breakdown_element; 
+  relating : General_breakdown_element; 
+END_ENTITY;
+
+ENTITY General_breakdown_element_relationship;  -- SBC2
+  description   : OPTIONAL STRING; 
+  related       : General_breakdown_element; 
+  relating      : General_breakdown_element; 
+  relation_type : STRING; 
+END_ENTITY;
+
+ENTITY General_breankdown  -- SBC2
+SUBTYPE OF ( Breakdown );
+  breakdown_type : STRING; 
 END_ENTITY;
 
 ENTITY General_part_instance_relationship  -- SBC2
@@ -1656,7 +1770,8 @@ SUBTYPE OF ( Part_version_view_instance_relationship );
   relation_type : STRING; 
 END_ENTITY;
 
-ENTITY General_part_version_view_relationship;  -- SBC3
+ENTITY General_part_version_view_relationship  -- SBC3
+SUBTYPE OF ( Part_version_view_relationship );
   relation_type : STRING; 
 END_ENTITY;
 
@@ -1681,7 +1796,8 @@ ENTITY Geometric_model ABSTRACT;  -- GS
   geometry_type : SET [1:?] OF STRING; 
 END_ENTITY;
 
-ENTITY Geometrical_relationship;  -- SBC3
+ENTITY Geometrical_relationship  -- SBC3
+SUBTYPE OF ( Part_version_view_relationship );
   placement : transformation_select; 
 END_ENTITY;
 
@@ -1715,7 +1831,7 @@ ENTITY Information_right;
   restriction    : OPTIONAL STRING; 
 END_ENTITY;
 
-ENTITY Information_usage_right;
+ENTITY Information_usage_right;  -- GMI3
   additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
   description    : OPTIONAL STRING; 
   grants_right   : SET [1:?] OF Information_right; 
@@ -1723,12 +1839,12 @@ ENTITY Information_usage_right;
   name           : STRING; 
 END_ENTITY;
 
-ENTITY Information_usage_right_assignment;
+ENTITY Information_usage_right_assignment;  -- GMI3
   assigned_right : Information_usage_right; 
   is_assigned_to : SET [1:?] OF information_usage_right_select; 
 END_ENTITY;
 
-ENTITY Information_usage_right_relationship;
+ENTITY Information_usage_right_relationship;  -- GMI3
   description   : OPTIONAL STRING; 
   related       : Information_usage_right; 
   relating      : Information_usage_right; 
@@ -1738,27 +1854,27 @@ END_ENTITY;
 ENTITY Instance_placement;  -- SBC2
   placed_instance     : Single_part_instance; 
   placement           : transformation_select; 
-  reference_component : Product_component; 
+  reference_component : Physical_breakdown_element; 
 END_ENTITY;
 
-ENTITY Kinematic_path ABSTRACT
+ENTITY Kinematic_path ABSTRACT  -- K2
 SUPERTYPE OF ( ONEOF (Kinematic_path_defined_by_curves, Kinematic_path_defined_by_nodes));
   name                   : OPTIONAL STRING; 
   representation_context : Cartesian_coordinate_space; 
   t_start                : REAL; 
 END_ENTITY;
 
-ENTITY Kinematic_path_defined_by_curves
+ENTITY Kinematic_path_defined_by_curves  -- K2
 SUBTYPE OF ( Kinematic_path );
   segments : LIST [1:?] OF Curve_based_path_segment; 
 END_ENTITY;
 
-ENTITY Kinematic_path_defined_by_nodes
+ENTITY Kinematic_path_defined_by_nodes  -- K2
 SUBTYPE OF ( Kinematic_path );
   segments : LIST [1:?] OF Path_based_path_segment; 
 END_ENTITY;
 
-ENTITY Kinematic_path_segment ABSTRACT
+ENTITY Kinematic_path_segment ABSTRACT  -- K2
 SUPERTYPE OF ( ONEOF (Curve_based_path_segment, Path_based_path_segment));
   t_end      : REAL; 
   transition : transition_code_enum; 
@@ -1782,17 +1898,17 @@ ENTITY Library_reference;  -- DM3
   library_type   : STRING; 
 END_ENTITY;
 
-ENTITY Line_curve
+ENTITY Line_curve  -- K2
 SUBTYPE OF ( Curve );
   direction : Direction; 
   point     : Cartesian_point; 
 END_ENTITY;
 
-ENTITY Linear_path
+ENTITY Linear_path  -- K2
 SUBTYPE OF ( Path_based_path_segment );
 END_ENTITY;
 
-ENTITY Link_motion_along_path;
+ENTITY Link_motion_along_path;  -- K2
   additional_ids         : OPTIONAL SET [1:?] OF Assigned_id; 
   description            : OPTIONAL STRING; 
   id                     : OPTIONAL Assigned_id; 
@@ -1801,13 +1917,13 @@ ENTITY Link_motion_along_path;
   representation_context : Cartesian_coordinate_space_with_parameter; 
 END_ENTITY;
 
-ENTITY Link_motion_relationship;
+ENTITY Link_motion_relationship;  -- K2
   related                : Geometric_model; 
   relating               : Link_motion_along_path; 
   tranformation_operator : Link_motion_transformation; 
 END_ENTITY;
 
-ENTITY Link_motion_transformation;
+ENTITY Link_motion_transformation;  -- K2
   transform_item1 : Axis2_placement_3d; 
   transform_item2 : Kinematic_path; 
 END_ENTITY;
@@ -1844,11 +1960,11 @@ ENTITY Mass_property_definition  -- C1
 SUBTYPE OF ( Property_definition );
 END_ENTITY;
 
-ENTITY Mated_part_association
+ENTITY Mated_part_association  -- PP2
 SUBTYPE OF ( Assembly_component_relationship );
 END_ENTITY;
 
-ENTITY Mated_part_relationship;
+ENTITY Mated_part_relationship;  -- PP2
   mated_shapes     : OPTIONAL SET [1:?] OF Assembly_joint; 
   mating_materials : OPTIONAL SET [1:?] OF Quantified_part_instance; 
   related          : Mated_part_association; 
@@ -1948,7 +2064,7 @@ ENTITY Organization_relationship;  -- GMI1
   relation_type : STRING; 
 END_ENTITY;
 
-ENTITY Parabola
+ENTITY Parabola  -- K2
 SUBTYPE OF ( Conic_curve );
   focal_distance : Numerical_value; 
 END_ENTITY;
@@ -1969,13 +2085,6 @@ ENTITY Part_category;  -- PI1
   scope       : Organization; 
 INVERSE 
   categorized_parts : SET [1:?] OF Part FOR categories; 
-END_ENTITY;
-
-ENTITY Part_function_association;  -- SBC2
-  associated_part_version     : Part_version_or_view_select; 
-  associated_product_function : Product_function; 
-  association_type            : STRING; 
-  description                 : OPTIONAL STRING; 
 END_ENTITY;
 
 ENTITY Part_instance ABSTRACT  -- SBC3
@@ -2042,19 +2151,19 @@ SUPERTYPE OF ( ONEOF (Assembly_component_relationship, Collected_part_relationsh
 END_ENTITY;
 
 ENTITY Part_version_view_relationship ABSTRACT  -- SBC3
-SUPERTYPE OF ( ONEOF (Make_from_relationship, Replaced_version_view_relationship, Process_state_relationship, Tool_part_relationship));
+SUPERTYPE OF ( ONEOF (General_part_version_view_relationship, Geometrical_relationship, Make_from_relationship, Replaced_version_view_relationship, Process_state_relationship, Tool_part_relationship));
   description : OPTIONAL STRING; 
   related     : Part_version_view; 
   relating    : Part_version_view; 
 END_ENTITY;
 
-ENTITY Path_based_path_segment ABSTRACT
+ENTITY Path_based_path_segment ABSTRACT  -- K2
 SUPERTYPE OF ( ONEOF (Curve_based_path, Circular_path, Point_to_point_path, Linear_path))
 SUBTYPE OF ( Kinematic_path_segment );
   placement_end : Axis2_placement_3d; 
 END_ENTITY;
 
-ENTITY Path_parameter_set;
+ENTITY Path_parameter_set;  -- K2
   additional_ids    : OPTIONAL SET [1:?] OF Assigned_id; 
   description       : OPTIONAL STRING; 
   id                : OPTIONAL Assigned_id; 
@@ -2094,6 +2203,26 @@ ENTITY Physical_assembly_relationship;  -- PPP1
   assembly          : Physical_instance; 
   component         : Physical_instance; 
   is_realization_of : Part_instance; 
+END_ENTITY;
+
+ENTITY Physical_breakdown_element  -- SBC2
+SUBTYPE OF ( Breakdown_element );
+END_ENTITY;
+
+ENTITY Physical_breakdown_element_decomposition_relationship;  -- SBC2
+  related  : Physical_breakdown_element; 
+  relating : Physical_breakdown_element; 
+END_ENTITY;
+
+ENTITY Physical_breakdown_element_relationship;  -- SBC2
+  description   : OPTIONAL STRING; 
+  related       : Physical_breakdown_element; 
+  relating      : Physical_breakdown_element; 
+  relation_type : STRING; 
+END_ENTITY;
+
+ENTITY Physical_breankdown  -- SBC2
+SUBTYPE OF ( Breakdown );
 END_ENTITY;
 
 ENTITY Physical_document_definition  -- DM2
@@ -2147,11 +2276,11 @@ ENTITY Plib_property_reference;  -- DM3
   version    : STRING; 
 END_ENTITY;
 
-ENTITY Point_to_point_path
+ENTITY Point_to_point_path  -- K2
 SUBTYPE OF ( Path_based_path_segment );
 END_ENTITY;
 
-ENTITY Process_operation_definition;
+ENTITY Process_operation_definition;  -- PP1
   additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
   description    : OPTIONAL STRING; 
   id             : Assigned_id; 
@@ -2160,23 +2289,23 @@ ENTITY Process_operation_definition;
   version_id     : OPTIONAL STRING; 
 END_ENTITY;
 
-ENTITY Process_operation_definition_relationship;
+ENTITY Process_operation_definition_relationship;  -- PP1
   description   : OPTIONAL STRING; 
   related       : Process_operation_definition; 
   relating      : Process_operation_definition; 
   relation_type : STRING; 
 END_ENTITY;
 
-ENTITY Process_operation_input_or_output;
+ENTITY Process_operation_input_or_output;  -- PP1
   concerned_shapes : OPTIONAL SET [1:?] OF shape_element; 
   description      : OPTIONAL STRING; 
   element          : process_operation_input_or_output_select; 
-  OPERATION        : Process_operation_occurrence; 
+  operation        : Process_operation_occurrence; 
   placement        : OPTIONAL transformation; 
   role             : STRING; 
 END_ENTITY;
 
-ENTITY Process_operation_occurrence;
+ENTITY Process_operation_occurrence;  -- PP1
   additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
   defined_in     : OPTIONAL Cartesian_coordinate_space; 
   definition     : Process_operation_definition; 
@@ -2184,7 +2313,7 @@ ENTITY Process_operation_occurrence;
   plan           : Process_plan; 
 END_ENTITY;
 
-ENTITY Process_operation_occurrence_relationship;
+ENTITY Process_operation_occurrence_relationship;  -- PP1
   cycle_time    : OPTIONAL Duration; 
   description   : OPTIONAL STRING; 
   related       : Process_operation_occurrence; 
@@ -2193,7 +2322,7 @@ ENTITY Process_operation_occurrence_relationship;
   waiting_time  : OPTIONAL Property; 
 END_ENTITY;
 
-ENTITY Process_operation_resource_assignment;
+ENTITY Process_operation_resource_assignment;  -- PP1
   assigned_resource : resource_definition_select; 
   is_assigned_to    : Process_operation_occurrence; 
   placement         : OPTIONAL Transformation; 
@@ -2201,7 +2330,7 @@ ENTITY Process_operation_resource_assignment;
   reference_tool    : BOOLEAN; 
 END_ENTITY;
 
-ENTITY Process_plan;
+ENTITY Process_plan;  -- PP1
   additional_ids   : OPTIONAL SET [1:?] OF Assigned_id; 
   description      : OPTIONAL STRING; 
   id               : Assigned_id; 
@@ -2210,7 +2339,7 @@ ENTITY Process_plan;
   version_id       : OPTIONAL STRING; 
 END_ENTITY;
 
-ENTITY Process_plan_relationship;
+ENTITY Process_plan_relationship;  -- PP1
   description   : OPTIONAL STRING; 
   related       : Process_plan; 
   relating      : Process_plan; 
@@ -2222,7 +2351,7 @@ SUBTYPE OF ( Property_assignment );
   is_assigned_to : SET [1:?] OF process_property_select; 
 END_ENTITY;
 
-ENTITY Process_state_relationship
+ENTITY Process_state_relationship  -- PP2
 SUBTYPE OF ( Part_version_view_relationship );
 END_ENTITY;
 
@@ -2242,15 +2371,6 @@ ENTITY Product_class_relationship;  -- SBC1
   related       : Product_class; 
   relating      : Product_class; 
   relation_type : STRING; 
-END_ENTITY;
-
-ENTITY Product_component  -- SBC2
-SUBTYPE OF ( Breakdown_element );
-  description       : OPTIONAL STRING; 
-  instance_required : BOOLEAN; 
-  is_influenced_by  : OPTIONAL SET [1:?] OF Class_category_association; 
-  is_relevant_for   : OPTIONAL SET [1:?] OF Application_context; 
-  name              : OPTIONAL STRING; 
 END_ENTITY;
 
 ENTITY Product_configuration;  -- SBC4
@@ -2275,20 +2395,6 @@ END_ENTITY;
 ENTITY Product_design_association;  -- SBC4
   associated_part_version          : Part_version; 
   associated_product_configuration : Product_configuration; 
-END_ENTITY;
-
-ENTITY Product_function  -- SBC2
-SUBTYPE OF ( Breakdown_element );
-  description     : OPTIONAL STRING; 
-  is_relevant_for : OPTIONAL SET [1:?] OF Application_context; 
-  name            : OPTIONAL STRING; 
-END_ENTITY;
-
-ENTITY Product_structure_relationship;  -- SBC2
-  description   : OPTIONAL STRING; 
-  related       : product_constituent_select; 
-  relating      : Breakdown_element; 
-  relation_type : STRING; 
 END_ENTITY;
 
 ENTITY Project;  -- GMI2
@@ -2480,7 +2586,7 @@ ENTITY Retention_period;  -- GMI1
   start          : event_or_date_select; 
 END_ENTITY;
 
-ENTITY Same_time_machining_relationship
+ENTITY Same_time_machining_relationship  -- PP2
 SUBTYPE OF ( Part_instance_relationship );
   placement : OPTIONAL transformation_select; 
 END_ENTITY;
@@ -2623,7 +2729,6 @@ END_ENTITY;
 
 ENTITY Technical_solution  -- SBC2
 SUBTYPE OF ( Alternative_solution );
-  description : STRING; 
 END_ENTITY;
 
 ENTITY Template_instance;  -- SBC3
@@ -2668,7 +2773,7 @@ SUBTYPE OF ( Effectivity );
   effectivity_period : Time_interval; 
 END_ENTITY;
 
-ENTITY Tool_part_relationship
+ENTITY Tool_part_relationship  -- PP2
 SUBTYPE OF ( Part_version_view_relationship );
   placement : OPTIONAL transformation_select; 
 END_ENTITY;
