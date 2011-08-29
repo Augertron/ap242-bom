@@ -1,7 +1,7 @@
 SCHEMA AP242_BO_Model;
 
--- Version: 1.0 second internal draft
--- Generation time: 2011-08-24T21:39:27+01:00
+-- Version: 1.0 third internal draft
+-- Generation time: 2011-08-28T23:01:59+01:00
 
 TYPE limit_qualifier = STRING; END_TYPE;
 TYPE quantity = STRING; END_TYPE;
@@ -19,13 +19,6 @@ TYPE evaluation_status_enum = ENUMERATION OF (
   not_evaluatable, 
   to_be_evaluated, 
   valid 
-  ); 
-END_TYPE;
-
-TYPE knot_type_enum = ENUMERATION OF ( 
-  bezier, 
-  quasi_uniform, 
-  uniform 
   ); 
 END_TYPE;
 
@@ -1086,17 +1079,8 @@ SUPERTYPE OF ( ONEOF (Axis1_placement, Axis2_placement_2d, Axis2_placement_3d));
   name     : OPTIONAL STRING; 
 END_ENTITY;
 
-ENTITY B_spline_curve  -- K2
-SUPERTYPE OF ( ONEOF (Curve_with_explicit_knots, Curve_with_implicit_knots))
-SUBTYPE OF ( Curve );
-  closed         : BOOLEAN; 
-  control_points : LIST [2:?] OF Cartesian_point; 
-  degree         : INTEGER; 
-  weight_values  : OPTIONAL LIST [2:?] OF REAL; 
-END_ENTITY;
-
 ENTITY Breakdown ABSTRACT
-SUPERTYPE OF ( ONEOF (Physical_breankdown, Functional_breankdown, General_breankdown));
+SUPERTYPE OF ( ONEOF (Physical_breakdown, Functional_breakdown, General_breakdown));
   additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
   description    : OPTIONAL STRING; 
   id             : Assigned_id; 
@@ -1150,13 +1134,7 @@ SUBTYPE OF ( Cartesian_coordinate_space );
 END_ENTITY;
 
 ENTITY Cartesian_coordinate_space_3d  -- SBC3
-SUPERTYPE OF (Cartesian_coordinate_space_with_parameter)
 SUBTYPE OF ( Cartesian_coordinate_space );
-END_ENTITY;
-
-ENTITY Cartesian_coordinate_space_with_parameter  -- K2
-SUBTYPE OF ( Cartesian_coordinate_space_3d );
-  unit : OPTIONAL Unit; 
 END_ENTITY;
 
 ENTITY Cartesian_point;  -- SBC3
@@ -1188,13 +1166,8 @@ ENTITY Characteristic_assignment;
   description              : OPTIONAL STRING; 
 END_ENTITY;
 
-ENTITY Circle  -- K2
-SUBTYPE OF ( Conic_curve );
-  radius : Numerical_value; 
-END_ENTITY;
-
 ENTITY Circular_path  -- K2
-SUBTYPE OF ( Path_based_path_segment );
+SUBTYPE OF ( Path_segment );
   via_point : Cartesian_point; 
 END_ENTITY;
 
@@ -1294,12 +1267,6 @@ ENTITY Configuration;  -- SBC4
   is_solution_for    : configured_specification_select; 
 END_ENTITY;
 
-ENTITY Conic_curve ABSTRACT  -- K2
-SUPERTYPE OF ( ONEOF (Circle, Ellipse, Parabola, Hyperbola))
-SUBTYPE OF ( Curve );
-  position : Axis_placement; 
-END_ENTITY;
-
 ENTITY Contract;  -- GMI2
   additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
   contract_type  : STRING; 
@@ -1316,34 +1283,6 @@ END_ENTITY;
 
 ENTITY Cost_property_definition  -- C1
 SUBTYPE OF ( Property_definition );
-END_ENTITY;
-
-ENTITY Curve ABSTRACT  -- K2
-SUPERTYPE OF ( ONEOF (B_spline_curve, Line_curve, Conic_curve));
-  name : OPTIONAL STRING; 
-END_ENTITY;
-
-ENTITY Curve_based_path  -- K2
-SUBTYPE OF ( Path_based_path_segment );
-  curve_path : Curve; 
-END_ENTITY;
-
-ENTITY Curve_based_path_segment  -- K2
-SUBTYPE OF ( Kinematic_path_segment );
-  orientation : B_spline_curve; 
-  parameters  : OPTIONAL Path_parameter_set; 
-  position    : B_spline_curve; 
-END_ENTITY;
-
-ENTITY Curve_with_explicit_knots  -- K2
-SUBTYPE OF ( B_spline_curve );
-  knot_multiplicities : LIST [2:?] OF INTEGER; 
-  knot_values         : LIST [2:?] OF REAL; 
-END_ENTITY;
-
-ENTITY Curve_with_implicit_knots  -- K2
-SUBTYPE OF ( B_spline_curve );
-  knot_type : knot_type_enum; 
 END_ENTITY;
 
 ENTITY Data_environment;  -- C2
@@ -1476,7 +1415,7 @@ END_ENTITY;
 ENTITY Document_definition ABSTRACT  -- DM2
 SUPERTYPE OF ( ONEOF (Digital_document_definition, Physical_representation));
   associated_document_version : Document_version; 
-  common_locations            : OPTIONAL SET [1:?] OF Document_location; 
+  common_locations            : OPTIONAL SET [1:?] OF Document_location_identification; 
   content                     : OPTIONAL Document_content_property; 
   creation                    : OPTIONAL Document_creation_property; 
   description                 : OPTIONAL STRING; 
@@ -1504,7 +1443,7 @@ ENTITY Document_format_property;  -- DM2
   size_format    : OPTIONAL Rectangular_size; 
 END_ENTITY;
 
-ENTITY Document_location  -- DM2
+ENTITY Document_location_identification  -- DM2
 SUBTYPE OF ( External_source_identification );
   SELF\External_source_identification.source_id RENAMED location_name : STRING; 
 END_ENTITY;
@@ -1582,12 +1521,6 @@ ENTITY Element_delivery;  -- AWM1
   role                 : STRING; 
 END_ENTITY;
 
-ENTITY Ellipse  -- K2
-SUBTYPE OF ( Conic_curve );
-  first_semi_axis  : Numerical_value; 
-  second_semi_axis : Numerical_value; 
-END_ENTITY;
-
 ENTITY Evaluated_characteristic;  -- RR3
   actual_characteristics : OPTIONAL SET [1:?] OF Property; 
   evaluation_activity    : OPTIONAL Activity; 
@@ -1652,6 +1585,7 @@ END_ENTITY;
 
 ENTITY External_model_relationship;
   description   : OPTIONAL STRING; 
+  placement     : OPTIONAL Transformation; 
   related       : External_model; 
   relating      : External_model; 
   relation_type : STRING; 
@@ -1663,7 +1597,7 @@ SUBTYPE OF ( External_model );
 END_ENTITY;
 
 ENTITY External_source_identification
-SUPERTYPE OF ( ONEOF (Document_location, File_location));
+SUPERTYPE OF ( ONEOF (Document_location_identification, File_location_identification));
   description : OPTIONAL STRING; 
   source_id   : STRING; 
   source_type : STRING; 
@@ -1678,16 +1612,16 @@ SUPERTYPE OF ( ONEOF (Digital_file, Hardcopy));
   file_format       : OPTIONAL Document_format_property; 
   file_type         : OPTIONAL SET [1:?] OF Document_type_property; 
   id                : Assigned_id; 
-  ids_and_locations : OPTIONAL SET [1:?] OF File_location; 
+  ids_and_locations : OPTIONAL SET [1:?] OF FIle_location_identification; 
   size              : OPTIONAL Document_size_property; 
   version_id        : OPTIONAL STRING; 
 END_ENTITY;
 
-ENTITY File_location  -- DM2
+ENTITY File_location_identification  -- DM2
 SUBTYPE OF ( External_source_identification );
   additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
   id             : OPTIONAL Assigned_id; 
-  location       : Document_location; 
+  location       : Document_location_identification; 
 END_ENTITY;
 
 ENTITY File_relationship;  -- DM2
@@ -1701,6 +1635,10 @@ ENTITY Final_solution
 SUBTYPE OF ( Alternative_solution );
   specifications : SET [1:?] OF final_definition_select; 
   status         : STRING; 
+END_ENTITY;
+
+ENTITY Functional_breakdown  -- SBC2
+SUBTYPE OF ( Breakdown );
 END_ENTITY;
 
 ENTITY Functional_breakdown_element  -- SBC2
@@ -1724,13 +1662,14 @@ ENTITY Functional_breakdown_element_relationship;  -- SBC2
   relation_type : STRING; 
 END_ENTITY;
 
-ENTITY Functional_breankdown  -- SBC2
-SUBTYPE OF ( Breakdown );
-END_ENTITY;
-
 ENTITY General_assembly_component_relationship  -- SBC3
 SUBTYPE OF ( Assembly_component_relationship );
   relation_type : STRING; 
+END_ENTITY;
+
+ENTITY General_breakdown  -- SBC2
+SUBTYPE OF ( Breakdown );
+  breakdown_type : STRING; 
 END_ENTITY;
 
 ENTITY General_breakdown_element  -- SBC2
@@ -1748,11 +1687,6 @@ ENTITY General_breakdown_element_relationship;  -- SBC2
   related       : General_breakdown_element; 
   relating      : General_breakdown_element; 
   relation_type : STRING; 
-END_ENTITY;
-
-ENTITY General_breankdown  -- SBC2
-SUBTYPE OF ( Breakdown );
-  breakdown_type : STRING; 
 END_ENTITY;
 
 ENTITY General_part_instance_relationship  -- SBC2
@@ -1805,12 +1739,6 @@ ENTITY Hardcopy  -- DM2
 SUBTYPE OF ( File );
 END_ENTITY;
 
-ENTITY Hyperbola
-SUBTYPE OF ( Conic_curve );
-  imaginary_semi_axis : Numerical_value; 
-  semi_axis           : Numerical_value; 
-END_ENTITY;
-
 ENTITY Implicit_transformation_2d  -- SBC3
 SUBTYPE OF ( Transformation_2d );
   origin : Axis2_placement_2d; 
@@ -1857,27 +1785,12 @@ ENTITY Instance_placement;  -- SBC2
   reference_component : Physical_breakdown_element; 
 END_ENTITY;
 
-ENTITY Kinematic_path ABSTRACT  -- K2
-SUPERTYPE OF ( ONEOF (Kinematic_path_defined_by_curves, Kinematic_path_defined_by_nodes));
+ENTITY Kinematic_path_defined_by_nodes;  -- K2
   name                   : OPTIONAL STRING; 
+  placement_start        : Axis_placement; 
   representation_context : Cartesian_coordinate_space; 
+  segments               : LIST [1:?] OF Path_segment; 
   t_start                : REAL; 
-END_ENTITY;
-
-ENTITY Kinematic_path_defined_by_curves  -- K2
-SUBTYPE OF ( Kinematic_path );
-  segments : LIST [1:?] OF Curve_based_path_segment; 
-END_ENTITY;
-
-ENTITY Kinematic_path_defined_by_nodes  -- K2
-SUBTYPE OF ( Kinematic_path );
-  segments : LIST [1:?] OF Path_based_path_segment; 
-END_ENTITY;
-
-ENTITY Kinematic_path_segment ABSTRACT  -- K2
-SUPERTYPE OF ( ONEOF (Curve_based_path_segment, Path_based_path_segment));
-  t_end      : REAL; 
-  transition : transition_code_enum; 
 END_ENTITY;
 
 ENTITY Language;  -- GMI4
@@ -1898,23 +1811,24 @@ ENTITY Library_reference;  -- DM3
   library_type   : STRING; 
 END_ENTITY;
 
-ENTITY Line_curve  -- K2
-SUBTYPE OF ( Curve );
-  direction : Direction; 
-  point     : Cartesian_point; 
-END_ENTITY;
-
 ENTITY Linear_path  -- K2
-SUBTYPE OF ( Path_based_path_segment );
+SUBTYPE OF ( Path_segment );
 END_ENTITY;
 
 ENTITY Link_motion_along_path;  -- K2
   additional_ids         : OPTIONAL SET [1:?] OF Assigned_id; 
   description            : OPTIONAL STRING; 
   id                     : OPTIONAL Assigned_id; 
-  items                  : SET [1:?] OF Kinematic_path; 
+  items                  : SET [1:?] OF Kinematic_path_defined_by_nodes; 
   name                   : OPTIONAL STRING; 
-  representation_context : Cartesian_coordinate_space_with_parameter; 
+  representation_context : Cartesian_coordinate_space_3D; 
+  time_unit              : OPTIONAL Unit; 
+END_ENTITY;
+
+ENTITY Link_motion_decomposition_relationship;  -- K2
+  description : OPTIONAL STRING; 
+  related     : Link_motion_along_path; 
+  relating    : Link_motion_along_path; 
 END_ENTITY;
 
 ENTITY Link_motion_relationship;  -- K2
@@ -1925,7 +1839,7 @@ END_ENTITY;
 
 ENTITY Link_motion_transformation;  -- K2
   transform_item1 : Axis2_placement_3d; 
-  transform_item2 : Kinematic_path; 
+  transform_item2 : Kinematic_path_defined_by_nodes; 
 END_ENTITY;
 
 ENTITY Lot_configuration  -- SBC4
@@ -2064,11 +1978,6 @@ ENTITY Organization_relationship;  -- GMI1
   relation_type : STRING; 
 END_ENTITY;
 
-ENTITY Parabola  -- K2
-SUBTYPE OF ( Conic_curve );
-  focal_distance : Numerical_value; 
-END_ENTITY;
-
 ENTITY Part;  -- PI1
   additional_ids : OPTIONAL SET [1:?] OF Assigned_id; 
   categories     : SET [1:?] OF Part_category; 
@@ -2157,19 +2066,11 @@ SUPERTYPE OF ( ONEOF (General_part_version_view_relationship, Geometrical_relati
   relating    : Part_version_view; 
 END_ENTITY;
 
-ENTITY Path_based_path_segment ABSTRACT  -- K2
-SUPERTYPE OF ( ONEOF (Curve_based_path, Circular_path, Point_to_point_path, Linear_path))
-SUBTYPE OF ( Kinematic_path_segment );
+ENTITY Path_segment ABSTRACT  -- K2
+SUPERTYPE OF ( ONEOF (Circular_path, Point_to_point_path, Linear_path));
   placement_end : Axis2_placement_3d; 
-END_ENTITY;
-
-ENTITY Path_parameter_set;  -- K2
-  additional_ids    : OPTIONAL SET [1:?] OF Assigned_id; 
-  description       : OPTIONAL STRING; 
-  id                : OPTIONAL Assigned_id; 
-  name              : OPTIONAL STRING; 
-  parameter_context : Cartesian_coordinate_space_2d; 
-  parameters        : SET [1:?] OF B_spline_curve; 
+  t_end         : REAL; 
+  transition    : transition_code_enum; 
 END_ENTITY;
 
 ENTITY Person;  -- GMI1
@@ -2205,6 +2106,10 @@ ENTITY Physical_assembly_relationship;  -- PPP1
   is_realization_of : Part_instance; 
 END_ENTITY;
 
+ENTITY Physical_breakdown  -- SBC2
+SUBTYPE OF ( Breakdown );
+END_ENTITY;
+
 ENTITY Physical_breakdown_element  -- SBC2
 SUBTYPE OF ( Breakdown_element );
 END_ENTITY;
@@ -2219,10 +2124,6 @@ ENTITY Physical_breakdown_element_relationship;  -- SBC2
   related       : Physical_breakdown_element; 
   relating      : Physical_breakdown_element; 
   relation_type : STRING; 
-END_ENTITY;
-
-ENTITY Physical_breankdown  -- SBC2
-SUBTYPE OF ( Breakdown );
 END_ENTITY;
 
 ENTITY Physical_document_definition  -- DM2
@@ -2277,7 +2178,7 @@ ENTITY Plib_property_reference;  -- DM3
 END_ENTITY;
 
 ENTITY Point_to_point_path  -- K2
-SUBTYPE OF ( Path_based_path_segment );
+SUBTYPE OF ( Path_segment );
 END_ENTITY;
 
 ENTITY Process_operation_definition;  -- PP1
