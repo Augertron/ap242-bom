@@ -659,12 +659,6 @@ TYPE process_property_select = SELECT (
 );
 END_TYPE;
 
-TYPE product_constituent_select = SELECT ( 
-  Breakdown,
-  Part_instance
-);
-END_TYPE;
-
 TYPE project_information_select = SELECT ( 
   Activity,
   Breakdown,
