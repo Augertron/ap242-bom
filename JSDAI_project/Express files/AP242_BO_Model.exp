@@ -1,7 +1,7 @@
 SCHEMA AP242_BO_Model;
 
--- Version: 1.0 third internal draft
--- Generation time: 2011-08-28T23:01:59+01:00
+-- Version: 1.0 fourth internal draft, basis for development of v1.1
+-- Generation time: 2011-08-31T07:19:14+01:00
 
 TYPE limit_qualifier = STRING; END_TYPE;
 TYPE quantity = STRING; END_TYPE;
