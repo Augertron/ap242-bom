@@ -1,7 +1,7 @@
 SCHEMA AP242_BO_Model;
 
--- Version: 1.1, CD ballot release candidate 3
--- Generation time: 2011-10-03T12:58:26+01:00
+-- Version: 1.1, CD ballot release candidate 4
+-- Generation time: 2011-10-03T19:38:23+01:00
 
 TYPE limit_qualifier = STRING; END_TYPE;
 TYPE quantity = STRING; END_TYPE;
@@ -501,7 +501,6 @@ TYPE general_organizational_data_select = SELECT (
   Project,
   Property,
   Property_assignment,
-  Property_definition,
   Property_definition,
   Property_value,
   Realization_or_occurrence_relationship,
